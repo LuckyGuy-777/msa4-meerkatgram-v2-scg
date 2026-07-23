@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: msa4-meerkatgram-v2-scg
+  web:
+    error:
+      include-stacktrace: always
+      include-message: always
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+            - name : RequestSize
+              args:
+                maxSize: 20MB
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins: ${CORS_ALLOW_ORIGIN}
+                allowed-methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+                allowed-headers: "*"
+                allow-credentials: true
+          routes:
+            - id: ${AUTH_SERVICE_NAME}
+              uri: ${AUTH_SERVICE_URI}
+              predicates:
+                - Path=${AUTH_SERVICE_PREDICATE}
+            # Open API UI가 각 하위 서비스의 스펙을 GateWay 가 origin으로 받아와서 출력하도록 설정
+            # 1. url 이 늘어나면 -id 부터, filters 까지 복사해서, 붙여넣기 하고, 2. #Open API 에서 - name,url 부분을 복사 붙여넣기 하면됨
+            - id: ${AUTH_SERVICE_NAME}-docs
+              uri: ${AUTH_SERVICE_URI}
+              predicates:
+                - Path=/${AUTH_SERVICE_NAME}${AUTH_SERVICE_OPEN_API_PATH}
+              filters:
+                - RewritePath=/${AUTH_SERVICE_NAME}${AUTH_SERVICE_OPEN_API_PATH}, ${AUTH_SERVICE_OPEN_API_PATH}
+
+
+
+#Open API
+springdoc:
+  swagger-ui:
+    path: /docs
+    urls:
+      - name: ${AUTH_SERVICE_NAME}
+        url: /${AUTH_SERVICE_NAME}${AUTH_SERVICE_OPEN_API_PATH}
+
+
+#jwt
+jwt:
+  header-key: Authorization
+  scheme: Bearer
+  secret: ${JWT_SECRET}
