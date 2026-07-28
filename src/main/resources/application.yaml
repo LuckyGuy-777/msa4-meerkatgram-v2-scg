@@ -1,6 +1,10 @@
+server:
+  port: ${APP_PORT}
+
 spring:
   application:
     name: msa4-meerkatgram-v2-scg
+    version: v1
   web:
     error:
       include-stacktrace: always
@@ -10,7 +14,7 @@ spring:
       server:
         webflux:
           default-filters:
-            - name : RequestSize
+            - name: RequestSize
               args:
                 maxSize: 20MB
           globalcors:
@@ -26,24 +30,35 @@ spring:
               predicates:
                 - Path=${AUTH_SERVICE_PREDICATE}
             # Open API UI가 각 하위 서비스의 스펙을 GateWay 가 origin으로 받아와서 출력하도록 설정
-            # 1. url 이 늘어나면 -id 부터, filters 까지 복사해서, 붙여넣기 하고, 2. #Open API 에서 - name,url 부분을 복사 붙여넣기 하면됨
+            # 1. url 이 늘어나면 -id 부터, filters 까지 복사해서, 붙여넣기 하고, 2. Open API 에서 - name,url 부분을 복사 붙여넣기 하면됨
+            - id: ${POST_SERVICE_NAME}
+              uri: ${POST_SERVICE_URI}
+              predicates:
+                - Path=${POST_SERVICE_PREDICATE}
+
+            # Open API UI가 각 하위 서비스의 스펙을 GateWay가 origin으로 받아와서 출력하도록 설정
             - id: ${AUTH_SERVICE_NAME}-docs
               uri: ${AUTH_SERVICE_URI}
               predicates:
                 - Path=/${AUTH_SERVICE_NAME}${AUTH_SERVICE_OPEN_API_PATH}
               filters:
                 - RewritePath=/${AUTH_SERVICE_NAME}${AUTH_SERVICE_OPEN_API_PATH}, ${AUTH_SERVICE_OPEN_API_PATH}
+            - id: ${POST_SERVICE_NAME}-docs
+              uri: ${POST_SERVICE_URI}
+              predicates:
+                - Path=/${POST_SERVICE_NAME}${POST_SERVICE_OPEN_API_PATH}
+              filters:
+                - RewritePath=/${POST_SERVICE_NAME}${POST_SERVICE_OPEN_API_PATH}, ${POST_SERVICE_OPEN_API_PATH}
 
-
-
-#Open API
+# Open API
 springdoc:
   swagger-ui:
     path: /docs
     urls:
       - name: ${AUTH_SERVICE_NAME}
         url: /${AUTH_SERVICE_NAME}${AUTH_SERVICE_OPEN_API_PATH}
-
+      - name: ${POST_SERVICE_NAME}
+        url: /${POST_SERVICE_NAME}${POST_SERVICE_OPEN_API_PATH}
 
 #jwt
 jwt:
