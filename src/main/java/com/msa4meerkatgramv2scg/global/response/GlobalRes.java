@@ -19,12 +19,12 @@ public record GlobalRes<T>(
     }
 
     public static <T> GlobalRes<T> success(T data){
-        return GlobalRes.<T>from(CustomResponseCode.SUCCESS, data);
+        return GlobalRes.<T>from(CustomResponseCode.SCG_SUCCESS, data);
     }
 
 
     public static GlobalRes<Void> success() {
-        return GlobalRes.<Void>from(CustomResponseCode.SUCCESS);
+        return GlobalRes.<Void>from(CustomResponseCode.SCG_SUCCESS);
     }
 
 }
