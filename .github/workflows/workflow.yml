@@ -47,7 +47,7 @@ jobs:
           docker push $IMAGE:$GITHUB_RUN_NUMBER
     # TODO: 추후 k8s manifest 작성시, 추가 작업 필요
       - name: Checkout msa4-k8s-manifest
-        uses: actions/checkout@7
+        uses: actions/checkout@v7
         with:
           repository: ${{env.MANIFEST_REPO}}  # pull 받을 대상 레포를 설정
           token: ${{ secrets.MANIFEST_REPO_TOKEN }}  # 현재 작업중인 레파지터리와 다르므로, 토큰을 별도로 생성한 매니페스트 레파지터리의 토큰을 세팅
